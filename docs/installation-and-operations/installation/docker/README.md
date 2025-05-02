@@ -72,9 +72,9 @@ following command:
 ```shell
 docker run -it -p 8080:80 \
   -e OPENPROJECT_SECRET_KEY_BASE=secret \
-  -e OPENPROJECT_HOST__NAME=localhost:8080 \
+  -e OPENPROJECT_HOST_NAME=localhost:8080 \
   -e OPENPROJECT_HTTPS=false \
-  -e OPENPROJECT_DEFAULT__LANGUAGE=en \
+  -e OPENPROJECT_DEFAULT_LANGUAGE=en \
   openproject/openproject:15
 ```
 
@@ -82,9 +82,9 @@ Explanation of the used configuration values:
 
 - `-p 8080:80` binds the port 80 of the container to 8080 on the machine running docker.
 - `OPENPROJECT_SECRET_KEY_BASE` sets the secret key base for Rails. Please use a pseudo-random value for this and treat it like a password.
-- `OPENPROJECT_HOST__NAME` sets the host name of the application. This value is used for generating forms and links in emails, and needs to match the external request host name (The value users are seeing in their browsers).
+- `OPENPROJECT_HOST_NAME` sets the host name of the application. This value is used for generating forms and links in emails, and needs to match the external request host name (The value users are seeing in their browsers).
 - `OPENPROJECT_HTTPS=false` disables the on-by-default HTTPS mode of OpenProject so you can access the instance over HTTP-only. For all production systems we strongly advise not to set this to false, and instead set up a proper TLS/SSL termination on your outer web server.
-- `OPENPROJECT_DEFAULT__LANGUAGE` does two things. It controls for the very first installation, in which language basic data (such as types, status names, etc.) and demo data is being created in. It also sets the default fallback language for new users.
+- `OPENPROJECT_DEFAULT_LANGUAGE` does two things. It controls for the very first installation, in which language basic data (such as types, status names, etc.) and demo data is being created in. It also sets the default fallback language for new users.
 
 This will take a bit of time the first time you launch it, but after a few
 minutes you should see a success message indicating the default administration
@@ -103,7 +103,7 @@ achieved with the `-d` flag:
 ```shell
 docker run -d -p 8080:80 \
   -e OPENPROJECT_SECRET_KEY_BASE=secret \
-  -e OPENPROJECT_HOST__NAME=localhost:8080 \
+  -e OPENPROJECT_HOST_NAME=localhost:8080 \
   -e OPENPROJECT_HTTPS=false \
   openproject/openproject:15
 ```
@@ -133,14 +133,14 @@ those directories mounted:
 sudo mkdir -p /var/lib/openproject/{pgdata,assets}
 
 docker run -d -p 8080:80 --name openproject \
-  -e OPENPROJECT_HOST__NAME=openproject.example.com \
+  -e OPENPROJECT_HOST_NAME=openproject.example.com \
   -e OPENPROJECT_SECRET_KEY_BASE=secret \
   -v /var/lib/openproject/pgdata:/var/openproject/pgdata \
   -v /var/lib/openproject/assets:/var/openproject/assets \
   openproject/openproject:15
 ```
 
-Please make sure you set the correct public facing hostname in `OPENPROJECT_HOST__NAME`. If you don't have a load-balancing or proxying web server in front of your docker container,
+Please make sure you set the correct public facing hostname in `OPENPROJECT_HOST_NAME`. If you don't have a load-balancing or proxying web server in front of your docker container,
 you will otherwise be vulnerable to [HOST header injections](https://portswigger.net/web-security/host-header), as the internal server has no way of identifying the correct host name. We strongly recommend you use an external load-balancing or proxying web server for termination of TLS/SSL and general security hardening.
 
 **Note**: Make sure to replace `secret` with a random string. One way to generate one is to run `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` if you are on Linux.
@@ -222,7 +222,7 @@ All examples are based on the following assumptions:
 * certificate and key are located under `/etc/ssl/crt/server.{crt, key}`
 * the OpenProject docker container's port 80 is mapped to the docker host's port 8080
 
-*Important:* Once OpenProject is running make sure to also set the host name accordingly under Administration -> System Settings or set it directly during startup by setting `OPENPROJECT_HOST__NAME`.
+*Important:* Once OpenProject is running make sure to also set the host name accordingly under Administration -> System Settings or set it directly during startup by setting `OPENPROJECT_HOST_NAME`.
 
 > **NOTE:** There is [another example](../packaged/#external-ssltls-termination) for external SSL/TLS termination for **packaged** installations
 
@@ -307,7 +307,7 @@ If you want to run OpenProject in a subdirectory on your server, first you will
 need to configure OpenProject accordingly by adding the following options to the `docker run` call:
 
 ```shell
--e OPENPROJECT_RAILS__RELATIVE__URL__ROOT=/openproject
+-e OPENPROJECT_RAILS_RELATIVE_URL_ROOT=/openproject
 ```
 
 The **apache** configuration for this configuration then looks like this:
@@ -474,9 +474,9 @@ The first way is to mount the root certificate via the ``` --mount``` option int
 ```shell
 sudo docker run -it -p 8080:80 \
   -e OPENPROJECT_SECRET_KEY_BASE=secret \
-  -e OPENPROJECT_HOST__NAME=localhost:8080 \
+  -e OPENPROJECT_HOST_NAME=localhost:8080 \
   -e OPENPROJECT_HTTPS=false \
-  -e OPENPROJECT_DEFAULT__LANGUAGE=en \
+  -e OPENPROJECT_DEFAULT_LANGUAGE=en \
   --mount type=bind,source=$(pwd)/my_root.crt,target=/tmp/my_root.crt \ #mount my_root.crt to /tmp
   -e SSL_CERT_FILE=/tmp/my_root.crt \ #set the SSL_CERT_FILE to the path of my_root.crt
   openproject/openproject:15
@@ -645,11 +645,11 @@ x-op-app: &app
   <<: *restart_policy
   environment:
     ...
-    OPENPROJECT_ATTACHMENTS__STORAGE: "fog"
+    OPENPROJECT_ATTACHMENTS_STORAGE: "fog"
     OPENPROJECT_FOG_DIRECTORY: "«s3-bucket-name»"
     OPENPROJECT_FOG_CREDENTIALS_PROVIDER: "AWS"
-    OPENPROJECT_FOG_CREDENTIALS_AWS__ACCESS__KEY__ID: "«access-key-id»"
-    OPENPROJECT_FOG_CREDENTIALS_AWS__SECRET__ACCESS__KEY: "«secret-access-key»"
+    OPENPROJECT_FOG_CREDENTIALS_AWS_ACCESS_KEY_ID: "«access-key-id»"
+    OPENPROJECT_FOG_CREDENTIALS_AWS_SECRET_ACCESS_KEY: "«secret-access-key»"
     OPENPROJECT_FOG_CREDENTIALS_REGION: "«us-east-1»" # Must be the region that you created your bucket in
 ```
 
@@ -663,13 +663,13 @@ x-op-app: &app
   <<: *restart_policy
   environment:
     ...
-    OPENPROJECT_ATTACHMENTS__STORAGE: "fog"
+    OPENPROJECT_ATTACHMENTS_STORAGE: "fog"
     OPENPROJECT_FOG_DIRECTORY: "«s3-bucket-name»"
     OPENPROJECT_FOG_CREDENTIALS_PROVIDER: "aws" # Minio is S3 compliant, so we can use the AWS provider
     OPENPROJECT_FOG_CREDENTIALS_ENDPOINT: "«https://minio-host.domain.tld»" # URI for your MinIO instance
-    OPENPROJECT_FOG_CREDENTIALS_AWS__ACCESS__KEY__ID: "«access-key-id»"
-    OPENPROJECT_FOG_CREDENTIALS_AWS__SECRET__ACCESS__KEY: "«secret-access-key»"
-    OPENPROJECT_FOG_CREDENTIALS_PATH__STYLE: "true"
+    OPENPROJECT_FOG_CREDENTIALS_AWS_ACCESS_KEY_ID: "«access-key-id»"
+    OPENPROJECT_FOG_CREDENTIALS_AWS_SECRET_ACCESS_KEY: "«secret-access-key»"
+    OPENPROJECT_FOG_CREDENTIALS_PATH_STYLE: "true"
 ```
 
 ##### Database
@@ -707,7 +707,7 @@ x-op-app: &app
   <<: *restart_policy
   environment:
     # ...
-    - "OPENPROJECT_DISABLED__MODULES='backlogs meetings'"
+    - "OPENPROJECT_DISABLED_MODULES='backlogs meetings'"
 ```
 
 Please refer to our documentation on the [configuration](../../configuration/)
